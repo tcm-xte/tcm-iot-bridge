@@ -1,0 +1,72 @@
+name: Deploy IoT Bridge
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write    # Required for Workload Identity Federation
+
+    env:
+      PROJECT_ID: ${{ secrets.PROJECT_ID }}
+      REGION: ${{ secrets.REGION }}
+      TOPIC_ID: ${{ secrets.TOPIC_ID }}
+      AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
+      TF_STATE_BUCKET: ${{ secrets.TF_STATE_BUCKET }}
+      CLOUDRUN_SA: iot-bridge-sa@${{ secrets.PROJECT_ID }}.iam.gserviceaccount.com
+      IMAGE: gcr.io/${{ secrets.PROJECT_ID }}/iot-bridge:latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Authenticate to GCP via Workload Identity Federation
+      uses: google-github-actions/auth@v2
+      with:
+        workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+        service_account: ${{ env.CLOUDRUN_SA }}
+
+    - name: Setup gcloud
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        project_id: ${{ env.PROJECT_ID }}
+
+    - name: Build & Push container image
+      run: |
+        gcloud builds submit --tag $IMAGE ./app
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+
+    - name: Terraform Init
+      working-directory: ./terraform
+      run: |
+        terraform init \
+          -backend-config="bucket=${TF_STATE_BUCKET}" \
+          -backend-config="prefix=cloud-run" \
+          -backend-config="project=${PROJECT_ID}"
+
+    - name: Terraform Plan
+      working-directory: ./terraform
+      run: |
+        terraform plan \
+        -var="project_id=${PROJECT_ID}" \
+        -var="region=${REGION}" \
+        -var="topic_id=${TOPIC_ID}" \
+        -var="cloudrun_sa_email=${CLOUDRUN_SA}" \
+        -var="container_image=${IMAGE}" \
+        -var="auth_token=${AUTH_TOKEN}" \
+        -out=tfplan
+
+    # - name: Terraform Apply
+      # if: github.ref == 'refs/heads/main'
+      # working-directory: ./terraform
+      # run: |
+        # terraform apply -auto-approve tfplan
+

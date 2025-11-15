@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+
+# Secrets / Env
+.env
+secrets.*
+*.key
+*.json
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+
