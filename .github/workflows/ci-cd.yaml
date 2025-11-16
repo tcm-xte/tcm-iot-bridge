@@ -80,6 +80,7 @@ jobs:
         TF_STATE_BUCKET: ${{ env.TF_STATE_BUCKET }}
         IMAGE: ${{ env.IMAGE }}          
       run: |
+        export PROJECT_ID="${PROJECT_ID}"
         terraform init \
           -backend-config="bucket=${TF_STATE_BUCKET}" \
           -backend-config="prefix=cloud-run" \
