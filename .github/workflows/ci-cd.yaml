@@ -66,16 +66,28 @@ jobs:
           -backend-config="prefix=cloud-run" \
           -backend-config="project=${GCP_PROJECT_ID}"
 
+    # - name: Terraform Plan
+    #   working-directory: ./terraform
+    #   run: |
+    #     terraform plan \
+    #     -var="project_id=${GCP_PROJECT_ID}" \
+    #     -var="region=${REGION}" \
+    #     -var="topic_id=${TOPIC_ID}" \
+    #     -var="cloudrun_sa_email=${CLOUDRUN_SA}" \
+    #     -var="container_image=${IMAGE}" \
+    #     -var="auth_token=${AUTH_TOKEN}" \
+    #     -out=tfplan
+
     - name: Terraform Plan
       working-directory: ./terraform
       run: |
         terraform plan \
-        -var="project_id=${GCP_PROJECT_ID}" \
-        -var="region=${REGION}" \
-        -var="topic_id=${TOPIC_ID}" \
-        -var="cloudrun_sa_email=${CLOUDRUN_SA}" \
-        -var="container_image=${IMAGE}" \
-        -var="auth_token=${AUTH_TOKEN}" \
+        -var="project_id=$GCP_PROJECT_ID" \
+        -var="region=$REGION" \
+        -var="topic_id=$TOPIC_ID" \
+        -var="cloudrun_sa_email=$CLOUDRUN_SA" \
+        -var="container_image=$IMAGE" \
+        -var="auth_token=$AUTH_TOKEN" \
         -out=tfplan
 
     # - name: Terraform Apply
