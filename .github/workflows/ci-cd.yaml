@@ -21,7 +21,7 @@ jobs:
       TF_STATE_BUCKET: ${{ secrets.TF_STATE_BUCKET }}
       CLOUDRUN_SA: iot-bridge-sa@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
       # IMAGE: gcr.io/${{ secrets.GCP_PROJECT_ID }}/iot-bridge:latest
-      IMAGE: europe-west1-docker.pkg.dev//${{ secrets.GCP_PROJECT_ID }}/iot-bridge:latest
+      IMAGE: europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/iot-bridge:latest
       
 
     steps:
@@ -51,9 +51,8 @@ jobs:
         echo "Using project: ${{ secrets.PROJECT_ID }}"
         echo "Using  gcp project: ${{ secrets.GCP_PROJECT_ID }}"
         docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/iot-bridge:latest ./app
-        docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/iot-bridge:latest
-                                
-
+        docker push europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/iot-bridge:latest
+        
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
 
