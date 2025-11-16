@@ -37,6 +37,13 @@ jobs:
       with:
         project_id: ${{ env.GCP_PROJECT_ID }}
 
+    - name: Install gcloud latest
+      run: |
+        curl https://sdk.cloud.google.com | bash > /dev/null
+        source "$HOME/.bashrc"
+        gcloud components update
+    
+
     - name: Debug identity # temporary 
       run: |
         gcloud auth list
