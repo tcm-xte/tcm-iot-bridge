@@ -84,8 +84,8 @@ jobs:
           -var="auth_token=$AUTH_TOKEN" \
           -out=tfplan
 
-    # - name: Terraform Apply
-      # if: github.ref == 'refs/heads/main'
-      # working-directory: ./terraform
-      # run: |
-        # terraform apply -auto-approve tfplan
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main'
+      working-directory: ./terraform
+      run: |
+        terraform apply -auto-approve tfplan
