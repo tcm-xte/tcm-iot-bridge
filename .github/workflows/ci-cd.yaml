@@ -2,8 +2,7 @@ name: Deploy IoT Bridge
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
 
 jobs:
   deploy:
@@ -11,7 +10,7 @@ jobs:
 
     permissions:
       contents: read
-      id-token: write    # Required for Workload Identity Federation
+      id-token: write
 
     env:
       PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
@@ -21,13 +20,12 @@ jobs:
       TF_STATE_BUCKET: ${{ secrets.TF_STATE_BUCKET }}
       CLOUDRUN_SA: iot-bridge-sa@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
       IMAGE: europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/iot-bridge/iot-bridge:latest
-      
 
     steps:
     - name: Checkout
       uses: actions/checkout@v3
 
-    - name: Authenticate to GCP via Workload Identity Federation
+    - name: Authenticate to GCP via WIF
       uses: google-github-actions/auth@v2
       with:
         workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
@@ -37,62 +35,57 @@ jobs:
       uses: google-github-actions/setup-gcloud@v2
       with:
         project_id: ${{ env.GCP_PROJECT_ID }}
-                                                                   
 
-
-    # - name: Build & Push container image
-      # run: |
-        # gcloud builds submit --tag $IMAGE ./app
-
-    - name: Configure Docker for Artifact Registry # TB edited
+    - name: Configure Docker for Artifact Registry
       run: |
         gcloud auth configure-docker europe-west1-docker.pkg.dev
-
     - name: Build & Push Docker Container
       run: |
         echo "Using project: ${{ secrets.PROJECT_ID }}"
         echo "Using  gcp project: ${{ secrets.GCP_PROJECT_ID }}"
         docker build -t europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/iot-bridge/iot-bridge:latest ./app
         docker push europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/iot-bridge/iot-bridge:latest
-        
+
+
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
 
     - name: Terraform Init
       working-directory: ./terraform
+      env:
+        PROJECT_ID: ${{ env.PROJECT_ID }}
+        REGION: ${{ env.REGION }}
+        TOPIC_ID: ${{ env.TOPIC_ID }}
+        AUTH_TOKEN: ${{ env.AUTH_TOKEN }}
+        TF_STATE_BUCKET: ${{ env.TF_STATE_BUCKET }}
+        IMAGE: ${{ env.IMAGE }}
       run: |
         terraform init \
           -backend-config="bucket=${TF_STATE_BUCKET}" \
           -backend-config="prefix=cloud-run" \
-          -backend-config="project=${GCP_PROJECT_ID}"
-
-    # - name: Terraform Plan
-    #   working-directory: ./terraform
-    #   run: |
-    #     terraform plan \
-    #     -var="project_id=${GCP_PROJECT_ID}" \
-    #     -var="region=${REGION}" \
-    #     -var="topic_id=${TOPIC_ID}" \
-    #     -var="cloudrun_sa_email=${CLOUDRUN_SA}" \
-    #     -var="container_image=${IMAGE}" \
-    #     -var="auth_token=${AUTH_TOKEN}" \
-    #     -out=tfplan
+          -backend-config="project=${PROJECT_ID}"
 
     - name: Terraform Plan
       working-directory: ./terraform
+      env:
+        PROJECT_ID: ${{ env.PROJECT_ID }}
+        REGION: ${{ env.REGION }}
+        TOPIC_ID: ${{ env.TOPIC_ID }}
+        AUTH_TOKEN: ${{ env.AUTH_TOKEN }}
+        CLOUDRUN_SA: ${{ env.CLOUDRUN_SA }}
+        IMAGE: ${{ env.IMAGE }}
       run: |
         terraform plan \
-        -var="project_id=$GCP_PROJECT_ID" \
-        -var="region=$REGION" \
-        -var="topic_id=$TOPIC_ID" \
-        -var="cloudrun_sa_email=$CLOUDRUN_SA" \
-        -var="container_image=$IMAGE" \
-        -var="auth_token=$AUTH_TOKEN" \
-        -out=tfplan
+          -var="project_id=$PROJECT_ID" \
+          -var="region=$REGION" \
+          -var="topic_id=$TOPIC_ID" \
+          -var="cloudrun_sa_email=$CLOUDRUN_SA" \
+          -var="container_image=$IMAGE" \
+          -var="auth_token=$AUTH_TOKEN" \
+          -out=tfplan
 
     # - name: Terraform Apply
       # if: github.ref == 'refs/heads/main'
       # working-directory: ./terraform
       # run: |
         # terraform apply -auto-approve tfplan
-
