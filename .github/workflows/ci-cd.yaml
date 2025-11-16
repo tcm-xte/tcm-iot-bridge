@@ -37,6 +37,18 @@ jobs:
       with:
         project_id: ${{ env.GCP_PROJECT_ID }}
 
+    - name: Debug identity # temporary 
+      run: |
+        gcloud auth list
+        gcloud config list
+        gcloud sts token-exchange \
+          --audiences=${{ secrets.GCP_WIF_PROVIDER }} \
+          --grant-type=urn:ietf:params:oauth:grant-type:token-exchange \
+          --subject-token=ignored \
+          --subject-token-type=urn:ietf:params:oauth:token-type:jwt \
+          --output-file=token.json || true
+
+
     - name: Build & Push container image
       run: |
         gcloud builds submit --tag $IMAGE ./app
