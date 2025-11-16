@@ -50,7 +50,7 @@ jobs:
       run: |
         echo "Using project: ${{ secrets.PROJECT_ID }}"
         echo "Using  gcp project: ${{ secrets.GCP_PROJECT_ID }}"
-        docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/iot-bridge:latest ./app
+        docker build -t europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/iot-bridge:latest ./app
         docker push europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/iot-bridge:latest
         
     - name: Setup Terraform
