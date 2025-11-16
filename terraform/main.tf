@@ -76,5 +76,8 @@ resource "google_cloud_run_v2_service" "iot_bridge" {
     type           = "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST"
   }
 }
+terraform {
+  backend "gcs" {}
+}
 
 
