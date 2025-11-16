@@ -45,6 +45,9 @@ jobs:
       # run: |
         # gcloud builds submit --tag $IMAGE ./app
 
+    - name: Configure Docker for Artifact Registry # TB edited
+      run: |
+        gcloud auth configure-docker europe-west1-docker.pkg.dev
 
     - name: Build & Push Docker Container
       run: |
