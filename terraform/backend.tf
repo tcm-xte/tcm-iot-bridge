@@ -1,5 +1,7 @@
-backend "gcs" {
-  bucket = ""   # injected by GitHub Actions
-  prefix = ""   # injected by GitHub Actions
+terraform {
+  backend "gcs" {
+    bucket = ""
+    prefix = ""
+    project = ""
+  }
 }
-
