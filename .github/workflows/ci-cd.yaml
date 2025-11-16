@@ -20,7 +20,9 @@ jobs:
       AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
       TF_STATE_BUCKET: ${{ secrets.TF_STATE_BUCKET }}
       CLOUDRUN_SA: iot-bridge-sa@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
-      IMAGE: gcr.io/${{ secrets.GCP_PROJECT_ID }}/iot-bridge:latest
+      # IMAGE: gcr.io/${{ secrets.GCP_PROJECT_ID }}/iot-bridge:latest
+      IMAGE: europe-west1-docker.pkg.dev//${{ secrets.GCP_PROJECT_ID }}/iot-bridge:latest
+      
 
     steps:
     - name: Checkout
