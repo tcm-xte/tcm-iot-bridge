@@ -70,12 +70,12 @@ jobs:
       working-directory: ./terraform
       run: |
         terraform plan \
-        -var="project_id=${GCP_PROJECT_ID}" \
-        -var="region=${REGION}" \
-        -var="topic_id=${TOPIC_ID}" \
-        -var="cloudrun_sa_email=${CLOUDRUN_SA}" \
-        -var="container_image=${IMAGE}" \
-        -var="auth_token=${AUTH_TOKEN}" \
+        -var="project_id=${secrets.GCP_PROJECT_ID}" \
+        -var="region=${secrets.REGION}" \
+        -var="topic_id=${secrets.TOPIC_ID}" \
+        -var="cloudrun_sa_email=${secrets.CLOUDRUN_SA}" \
+        -var="container_image=${secrets.IMAGE}" \
+        -var="auth_token=${secrets.AUTH_TOKEN}" \
         -out=tfplan
 
     # - name: Terraform Apply
