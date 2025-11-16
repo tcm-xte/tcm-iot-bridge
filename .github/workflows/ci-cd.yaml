@@ -36,29 +36,19 @@ jobs:
       uses: google-github-actions/setup-gcloud@v2
       with:
         project_id: ${{ env.GCP_PROJECT_ID }}
+                                                                   
 
-    - name: Install gcloud latest
+
+    # - name: Build & Push container image
+      # run: |
+        # gcloud builds submit --tag $IMAGE ./app
+
+
+    - name: Build & Push Docker Container
       run: |
-        curl https://sdk.cloud.google.com | bash > /dev/null
-        source "$HOME/.bashrc"
-        gcloud components update
-    
-
-    - name: Debug identity # temporary 
-      run: |
-        gcloud auth list
-        gcloud config list
-        gcloud sts token-exchange \
-          --audiences=${{ secrets.GCP_WIF_PROVIDER }} \
-          --grant-type=urn:ietf:params:oauth:grant-type:token-exchange \
-          --subject-token=ignored \
-          --subject-token-type=urn:ietf:params:oauth:token-type:jwt \
-          --output-file=token.json || true
-
-
-    - name: Build & Push container image
-      run: |
-        gcloud builds submit --tag $IMAGE ./app
+        docker build -t gcr.io/${{ secrets.PROJECT_ID }}/iot-bridge:latest ./app
+        docker push gcr.io/${{ secrets.PROJECT_ID }}/iot-bridge:latest
+                                
 
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
