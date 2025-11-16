@@ -46,8 +46,10 @@ jobs:
 
     - name: Build & Push Docker Container
       run: |
-        docker build -t gcr.io/${{ secrets.PROJECT_ID }}/iot-bridge:latest ./app
-        docker push gcr.io/${{ secrets.PROJECT_ID }}/iot-bridge:latest
+        echo "Using project: ${{ secrets.PROJECT_ID }}"
+        echo "Using  gcp project: ${{ secrets.GCP_PROJECT_ID }}"
+        docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/iot-bridge:latest ./app
+        docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/iot-bridge:latest
                                 
 
     - name: Setup Terraform
