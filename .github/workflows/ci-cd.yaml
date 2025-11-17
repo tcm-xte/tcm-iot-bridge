@@ -84,7 +84,7 @@ jobs:
         terraform init \
           -backend-config="bucket=${TF_STATE_BUCKET}" \
           -backend-config="prefix=cloud-run" \
-          -backend-config="project=${PROJECT_ID}"
+          
 
     - name: Terraform Plan
       working-directory: ./terraform
