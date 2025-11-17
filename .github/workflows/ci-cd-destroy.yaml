@@ -1,7 +1,7 @@
 name: Destroy IoT Bridge
 
 on:
-  workflow_dispatch:  # manual trigger only
+  workflow_dispatch:   # allows manual trigger
 
 jobs:
   destroy:
@@ -9,42 +9,46 @@ jobs:
 
     permissions:
       contents: read
-      id-token: write
+      id-token: write    # Required for Workload Identity Federation
 
     env:
       PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
       REGION: ${{ secrets.REGION }}
-      TOPIC_ID: ${{ secrets.TOPIC_ID }}
-      AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
       TF_STATE_BUCKET: ${{ secrets.TF_STATE_BUCKET }}
       CLOUDRUN_SA: iot-bridge-sa@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
-      IMAGE: europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/iot-bridge/iot-bridge:latest
+      GITHUB_TERRAFORM_SA: github-terraform@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
 
     steps:
-    - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Authenticate to GCP via WIF
-      uses: google-github-actions/auth@v2
-      with:
-        workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
-        service_account: ${{ env.CLOUDRUN_SA }}
+      - name: Authenticate to GCP via Workload Identity Federation
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.GITHUB_TERRAFORM_SA }}
 
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v3
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
 
-    - name: Terraform Init
-      working-directory: ./terraform
-      run: |
-        export TF_VAR_project_id=$PROJECT_ID
-        export TF_VAR_region=$REGION
-        export TF_VAR_topic_id=$TOPIC_ID
-        export TF_VAR_auth_token=$AUTH_TOKEN
-        export TF_VAR_container_image=$IMAGE
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.4.0"
 
-        terraform init \
-          -backend-config="bucket=${TF_STATE_BUCKET}" \
-          -backend-config="prefix=cloud-run"
+      - name: Terraform Init
+        working-directory: ./terraform
+        run: |
+          terraform init \
+            -backend-config="bucket=${TF_STATE_BUCKET}" \
+            -backend-config="prefix=cloud-run"
 
-    - name: Terraform Destroy
-      working-directory: ./terraform
-      run: terraform destroy -auto-approve
+      - name: Terraform Destroy
+        working-directory: ./terraform
+        run: |
+          terraform destroy -auto-approve \
+            -var="project_id=${PROJECT_ID}" \
+            -var="region=${REGION}" \
+            -var="cloudrun_sa_email=${CLOUDRUN_SA}"
