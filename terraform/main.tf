@@ -62,6 +62,8 @@ resource "google_cloud_run_v2_service" "iot_bridge" {
   name     = "iot-bridge"
   location = var.region
 
+ingress = "INGRESS_TRAFFIC_ALL"
+
   template {
     service_account = google_service_account.cloudrun_sa.email
 
@@ -90,6 +92,19 @@ resource "google_cloud_run_v2_service" "iot_bridge" {
     type           = "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST"
   }
 }
+##
+resource "google_cloud_run_service_iam_binding" "public_invoker" {
+  location = var.region
+  service  = google_cloud_run_v2_service.iot_bridge.name
+  role     = "roles/run.invoker"
+
+  members = [
+    "allUsers",
+  ]
+}
+
+
+
 terraform {
   backend "gcs" {}
 }
