@@ -34,8 +34,9 @@ def publish():
         "current": current
     }
 
-    ordering_key = device
-    future = publisher.publish(topic_path, json.dumps(data).encode("utf-8"), ordering_key=ordering_key)
+#    ordering_key = device
+#    future = publisher.publish(topic_path, json.dumps(data).encode("utf-8"), ordering_key=ordering_key)
+    future = publisher.publish(topic_path, json.dumps(data).encode("utf-8"))
     msg_id = future.result()
     print(f"✅ Published message ID: {msg_id}, data: {data}")
 
