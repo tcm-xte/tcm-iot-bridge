@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - main
-
+    paths-ignore:
+      - '.github/workflows/ci-cd-destroy.yaml'  # ignore changes to this workflow file
 jobs:
   deploy:
     runs-on: ubuntu-latest
