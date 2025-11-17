@@ -15,11 +15,10 @@ provider "google" {
 }
 
 # --------------------------
-# Pub/Sub Topic with ordering
+# Pub/Sub Topic
 # --------------------------
 resource "google_pubsub_topic" "iot_topic" {
   name                   = var.topic_id
-  enable_message_ordering = true
 }
 
 
