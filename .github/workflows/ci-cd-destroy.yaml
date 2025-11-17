@@ -19,6 +19,8 @@ jobs:
       AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
       TF_STATE_BUCKET: ${{ secrets.TF_STATE_BUCKET }}
       CLOUDRUN_SA: iot-bridge-sa@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
+      GITHUB_TERRAFORM_SA: github-terraform@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
+
 
     steps:
     - name: Checkout
@@ -28,7 +30,7 @@ jobs:
       uses: google-github-actions/auth@v2
       with:
         workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
-        service_account: ${{ env.CLOUDRUN_SA }}
+        service_account: ${{ env.GITHUB_TERRAFORM_SA }}
 
     - name: Setup gcloud
       uses: google-github-actions/setup-gcloud@v2
