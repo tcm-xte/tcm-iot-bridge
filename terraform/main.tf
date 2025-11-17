@@ -22,6 +22,20 @@ resource "google_pubsub_topic" "iot_topic" {
 }
 
 # --------------------------
+# Pub/Sub Subscription
+# --------------------------
+resource "google_pubsub_subscription" "iot_ordered_sub" {
+  name  = "iot-ordered-subscription"
+  topic = google_pubsub_topic.iot_topic.name
+  enable_message_ordering = true
+  ack_deadline_seconds = 20
+  message_retention_duration = "600s"
+  expiration_policy {
+    ttl = ""
+  }
+}
+
+# --------------------------
 # Cloud Run Service Account
 # --------------------------
 resource "google_service_account" "cloudrun_sa" {
