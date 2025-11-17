@@ -47,10 +47,10 @@ jobs:
           -backend-config="bucket=${TF_STATE_BUCKET}" \
           -backend-config="prefix=cloud-run"
 
-    - name: Unlock Terraform state (if locked)
-      working-directory: ./terraform
-      run: |
-        terraform force-unlock -force $(terraform state list -state=terraform.tfstate | head -n1) || echo "No lock found"
+#    - name: Unlock Terraform state (if locked)
+#      working-directory: ./terraform
+#      run: |
+#        terraform force-unlock -force $(terraform state list -state=terraform.tfstate | head -n1) || echo "No lock found"
 
     # --- Step 1: Destroy Cloud Run service ---
     - name: Destroy Cloud Run
