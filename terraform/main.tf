@@ -62,7 +62,7 @@ resource "google_pubsub_topic_iam_binding" "pub_publisher" {
 resource "google_cloud_run_v2_service" "iot_bridge" {
   name     = "iot-bridge"
   location = var.region
-
+  deletion_protection = false
 ingress = "INGRESS_TRAFFIC_ALL"
 
   template {
