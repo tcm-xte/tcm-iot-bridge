@@ -75,6 +75,7 @@ jobs:
           echo "Deleting image with digest $digest"
           gcloud artifacts docker images delete \
             europe-west1-docker.pkg.dev/${PROJECT_ID}/iot-bridge/iot-bridge@$digest \
+            --delete-tags \
             --quiet
         done
       env:
