@@ -83,7 +83,6 @@ jobs:
           -var="auth_token=${AUTH_TOKEN}" \
           -var="cloudrun_sa_email=${CLOUDRUN_SA}" \
           -var="region=${REGION}" \
-          -var="image=${IMAGE}" \
           -var="container_image=${IMAGE}" \
           -var="topic_id=${TOPIC_ID}"
 
