@@ -74,7 +74,7 @@ jobs:
         for digest in $(gcloud artifacts docker images list europe-west1-docker.pkg.dev/${PROJECT_ID}/iot-bridge --format="get(DIGEST)"); do
           echo "Deleting image with digest $digest"
           gcloud artifacts docker images delete \
-            europe-west1-docker.pkg.dev/${PROJECT_ID}/iot-bridge@$digest \
+            europe-west1-docker.pkg.dev/${PROJECT_ID}/iot-bridge/iot-bridge@$digest \
             --quiet
         done
       env:
