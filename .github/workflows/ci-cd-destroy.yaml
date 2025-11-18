@@ -77,7 +77,7 @@ jobs:
         IMAGE: ${{ env.IMAGE }}
       run: |
         terraform destroy \
-          -target=google_pubsub_topic.iot_topic \
+          #-target=google_pubsub_topic.iot_topic \
           -auto-approve \
           -var="project_id=${PROJECT_ID}" \
           -var="auth_token=${AUTH_TOKEN}" \
