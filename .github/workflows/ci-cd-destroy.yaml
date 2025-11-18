@@ -66,3 +66,16 @@ jobs:
           -var="region=${REGION}" \
           -var="container_image=${IMAGE}" \
           -var="topic_id=${TOPIC_ID}"
+
+    #  Cleanup Docker images in Artifact Registry ---
+    - name: Delete all Docker images
+      run: |
+        echo "Cleaning up all images in Artifact Registry..."
+        for digest in $(gcloud artifacts docker images list europe-west1-docker.pkg.dev/${PROJECT_ID}/iot-bridge --format="get(digest)"); do
+          echo "Deleting image with digest $digest"
+          gcloud artifacts docker images delete \
+            europe-west1-docker.pkg.dev/${PROJECT_ID}/iot-bridge@$digest \
+            --quiet
+        done
+      env:
+        PROJECT_ID: ${{ env.PROJECT_ID }}
