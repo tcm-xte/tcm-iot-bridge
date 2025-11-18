@@ -57,6 +57,7 @@ jobs:
       working-directory: ./terraform
       run: |
         terraform destroy \
+          -input=false
           -target=google_cloud_run_v2_service.iot_bridge \
           -auto-approve \
           -var="project_id=${PROJECT_ID}" \
