@@ -49,10 +49,11 @@ def publish():
             data=encoded_data,
             ordering_key=ordering_key,
         )
-        msg_id = future.result()
+#        msg_id = future.result()
 
         logging.info(
-            f"✅ Published message ID: {msg_id} | Ordering key: {ordering_key} | Data: {data_str}"
+           # f"✅ Published message ID: {msg_id} | Ordering key: {ordering_key} | Data: {data_str}"
+            f"✅ Published | Ordering key: {ordering_key} | Data: {data_str}"
         )
 
         return ("HTTP ok: 200 Temperature: " + temperature, 200)
