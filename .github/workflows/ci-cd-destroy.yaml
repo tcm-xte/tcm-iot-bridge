@@ -57,7 +57,8 @@ jobs:
         TOPIC_ID: ${{ env.TOPIC_ID }}
         AUTH_TOKEN: ${{ env.AUTH_TOKEN }}
         TF_STATE_BUCKET: ${{ env.TF_STATE_BUCKET }}
-        IMAGE: ${{ env.IMAGE }}          
+        IMAGE: ${{ env.IMAGE }}    
+        
       run: |
         export PROJECT_ID="${PROJECT_ID}"
         terraform init \
@@ -79,5 +80,6 @@ jobs:
           -target=google_pubsub_topic.iot_topic \
           -auto-approve \
           -var="project_id=${PROJECT_ID}" \
+          -var="auth_token=${AUTH_TOKEN}" \
           -var="topic_id=${TOPIC_ID}"
 
