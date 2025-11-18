@@ -71,7 +71,7 @@ jobs:
     - name: Delete all Docker images
       run: |
         echo "Cleaning up all images in Artifact Registry..."
-        for digest in $(gcloud artifacts docker images list europe-west1-docker.pkg.dev/${PROJECT_ID}/iot-bridge --format="get(digest)"); do
+        for digest in $(gcloud artifacts docker images list europe-west1-docker.pkg.dev/${PROJECT_ID}/iot-bridge --format="get(DIGEST)"); do
           echo "Deleting image with digest $digest"
           gcloud artifacts docker images delete \
             europe-west1-docker.pkg.dev/${PROJECT_ID}/iot-bridge@$digest \
