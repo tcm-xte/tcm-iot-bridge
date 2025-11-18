@@ -1,8 +1,7 @@
 name: Destroy IoT Bridge
 
 on:
-  workflow_dispatch:   # manual trigger
-#  
+  workflow_dispatch: # manual trigger
 
 jobs:
   destroy:
@@ -21,7 +20,6 @@ jobs:
       CLOUDRUN_SA: iot-bridge-sa@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
       GITHUB_TERRAFORM_SA: github-terraform@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
 
-
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -37,36 +35,19 @@ jobs:
       with:
         project_id: ${{ env.PROJECT_ID }}
 
-
-#    - name: Unlock Terraform state (if locked)
-#      working-directory: ./terraform
-#      run: |
-#        terraform force-unlock -force $(terraform state list -state=terraform.tfstate | head -n1) || echo "No lock found"
-
-
-    # Terraform
-    # --------------------------
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
 
     - name: Terraform Init
       working-directory: ./terraform
       env:
-        PROJECT_ID: ${{ env.PROJECT_ID }}
-        REGION: ${{ env.REGION }}
-        TOPIC_ID: ${{ env.TOPIC_ID }}
-        AUTH_TOKEN: ${{ env.AUTH_TOKEN }}
         TF_STATE_BUCKET: ${{ env.TF_STATE_BUCKET }}
-        IMAGE: ${{ env.IMAGE }}    
-        
       run: |
-        export PROJECT_ID="${PROJECT_ID}"
         terraform init \
           -backend-config="bucket=${TF_STATE_BUCKET}" \
-          -backend-config="prefix=cloud-run" \
+          -backend-config="prefix=cloud-run"
 
-    # --- Step 3: Destroy Pub/Sub topic ---
-    - name: Destroy Pub/Sub topic
+    - name: Destroy all Terraform resources
       working-directory: ./terraform
       env:
         PROJECT_ID: ${{ env.PROJECT_ID }}
@@ -74,15 +55,12 @@ jobs:
         TOPIC_ID: ${{ env.TOPIC_ID }}
         AUTH_TOKEN: ${{ env.AUTH_TOKEN }}
         CLOUDRUN_SA: ${{ env.CLOUDRUN_SA }}
-        IMAGE: ${{ env.IMAGE }}
       run: |
         terraform destroy \
-          #-target=google_pubsub_topic.iot_topic \
           -auto-approve \
+          -input=false \
           -var="project_id=${PROJECT_ID}" \
           -var="auth_token=${AUTH_TOKEN}" \
           -var="cloudrun_sa_email=${CLOUDRUN_SA}" \
           -var="region=${REGION}" \
-          -var="container_image=${IMAGE}" \
           -var="topic_id=${TOPIC_ID}"
-
