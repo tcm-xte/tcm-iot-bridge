@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO)
 
 # === Configuration ===
 PROJECT_ID = os.environ.get("GCP_PROJECT", "r2d2-477711")
-TOPIC_ID = "shelly-topic"
+TOPIC_ID = "iot-topic"
 AUTH_TOKEN = os.environ.get(
     "AUTH_TOKEN", "[token value]"
 )
